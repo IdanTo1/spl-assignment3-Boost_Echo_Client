@@ -207,27 +207,34 @@ void UserHandler::logout(std::string& line) {
 void UserHandler::parseLine(std::string line) {
     UserActionsEnum cmd = findCmd(line);
     switch (cmd) {
-        case LOGIN:
+        case LOGIN: {
             login(line);
             break;
-        case JOIN_GENRE:
+        }
+        case JOIN_GENRE: {
             joinGenre(line);
             break;
-        case EXIT_GENRE:
+        }
+        case EXIT_GENRE: {
             exitGenre(line);
             break;
-        case ADD_BOOK:
+        }
+        case ADD_BOOK: {
             addBook(line);
             break;
-        case BORROW_BOOK:
+        }
+        case BORROW_BOOK: {
             borrowBook(line);
             break;
-        case RETURN_BOOK:
+        }
+        case RETURN_BOOK: {
             returnBook(line);
             break;
-        case GENRE_BOOK_STATUS:
+        }
+        case GENRE_BOOK_STATUS: {
             bookStatus(line);
             break;
+        }
         default: // Logout
             logout(line);
     }
