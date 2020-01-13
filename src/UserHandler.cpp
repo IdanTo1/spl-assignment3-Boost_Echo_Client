@@ -154,7 +154,7 @@ void UserHandler::borrowBook(std::string& line) {
 
     Frame frame = Frame(_actionFrameCommandMap[BORROW_BOOK]);
     frame.addHeader("destination", genre);
-    frame.setBody(_inventory.getUsername() + "wish to borrow" + book);
+    frame.setBody(_inventory.getUsername() + " wish to borrow " + book);
     sendFrame(frame);
 }
 
