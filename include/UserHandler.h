@@ -6,7 +6,6 @@
 #define BOOST_ECHO_CLIENT_CINHANDLER_H
 
 #include <iostream>
-#include <boost/lexical_cast.hpp>
 #include "ConcurrentDataQueues.h"
 #include "Frame.h"
 #include "ClientInventory.h"
