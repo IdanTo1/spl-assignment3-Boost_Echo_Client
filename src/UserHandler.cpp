@@ -67,8 +67,9 @@ Frame UserHandler::receiveFrame() {
 }
 
 void UserHandler::sendFrame(Frame frame) {
-    boost::lock_guard <boost::mutex> lock(_queues.mutexToServer);
+    boost::unique_lock <boost::mutex> lock(_queues.mutexToServer);
     _queues.framesToServer.push(frame);
+    _queues.condToServer.notify_all();
 }
 
 void UserHandler::login(std::string& line) {
