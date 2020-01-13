@@ -1,17 +1,35 @@
 CFLAGS:=-c -Wall -Weffc++ -g -std=c++11 -Iinclude
-LDFLAGS:=-lboost_system
+LDFLAGS:=-lboost_system -pthread
 
-all: EchoClient
-	g++ -o bin/echoExample bin/connectionHandler.o bin/echoClient.o $(LDFLAGS) 
+# All Targets
+all: StompBookClubClient
 
-EchoClient: bin/connectionHandler.o bin/echoClient.o
-	
-bin/connectionHandler.o: src/connectionHandler.cpp
-	g++ $(CFLAGS) -o bin/connectionHandler.o src/connectionHandler.cpp
+# Linker
+StompBookClubClient: bin/StompBookClubClient.o
+	g++ -o bin/StompBookClubClient.o bin/ConnectionHandler.o bin/UserHandler.o bin/ConcurrentDataQueues.o \
+		bin/Frame.o bin/ClientInventory.o $(LDFLAGS)
 
-bin/echoClient.o: src/echoClient.cpp
-	g++ $(CFLAGS) -o bin/echoClient.o src/echoClient.cpp
-	
-.PHONY: clean
+# Source Files
+bin/StompBookClubClient.o: src/StompBookClubClient.cpp include/StompBookClubClient.h \
+		bin/ConnectionHandler.o bin/UserHandler.o
+	g++ $(CFLAGS) -o bin/StompBookClubClient.o src/StompBookClubClient.cpp
+
+bin/ConnectionHandler.o: src/ConnectionHandler.cpp include/ConnectionHandler.h
+	g++ $(CFLAGS) -o bin/ConnectionHandler.o src/ConnectionHandler.cpp
+
+bin/UserHandler.o: src/UserHandler.cpp include/UserHandler.h bin/ConcurrentDataQueues.o bin/Frame.o bin/ClientInventory.o
+	g++ $(CFLAGS) -o bin/UserHandler.o src/UserHandler.cpp
+
+bin/ConcurrentDataQueues.o: src/ConcurrentDataQueues.cpp include/ConcurrentDataQueues.h bin/Frame.o
+	g++ $(CFLAGS) -o bin/ConcurrentDataQueues.o src/ConcurrentDataQueues.cpp
+
+bin/Frame.o: src/Frame.cpp include/Frame.h
+	g++ $(CFLAGS) -o bin/Frame.o src/Frame.cpp
+
+bin/ClientInventory.o: src/ClientInventory.cpp include/ClientInventory.h
+	g++ $(CFLAGS) -o bin/ClientInventory.o src/ClientInventory.cpp
+
+.PHONY: clean, all
+# clean the build directory.
 clean:
 	rm -f bin/*
