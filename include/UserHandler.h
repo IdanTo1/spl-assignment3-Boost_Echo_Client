@@ -63,7 +63,7 @@ class UserHandler {
         void logout(std::string& line);
 
     public:
-        UserHandler(ConcurrentDataQueues& queues, ClientInventory inventory);
+        UserHandler(ConcurrentDataQueues& queues, ClientInventory& inventory);
         ~UserHandler();
         void run();
 };

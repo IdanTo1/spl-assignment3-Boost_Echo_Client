@@ -5,7 +5,7 @@
 #include "../include/UserHandler.h"
 
 
-UserHandler::UserHandler(ConcurrentDataQueues& queues, ClientInventory inventory) :
+UserHandler::UserHandler(ConcurrentDataQueues& queues, ClientInventory& inventory) :
         _queues(queues), _inventory(inventory), _actionFrameCommandMap(initActionFrameCommandMap()) {}
 
 
