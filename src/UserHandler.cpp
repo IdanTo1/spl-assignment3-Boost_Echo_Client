@@ -75,7 +75,7 @@ void UserHandler::sendFrame(Frame frame) {
 void UserHandler::login(std::string& line) {
     std::vector <std::string> cmdParams;
     split(line, cmdParams, CMD_DELIMITER);
-    int portSeparator = cmdParams[1].find(":");
+    size_t portSeparator = cmdParams[1].find(":");
     std::string host = cmdParams[1].substr(0, portSeparator);
     std::string port = cmdParams[1].substr(portSeparator, cmdParams[1].size());
     std::string username = cmdParams[2];

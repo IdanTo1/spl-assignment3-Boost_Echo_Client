@@ -8,6 +8,11 @@
 #include <map>
 
 
+const std::string STOMP_DELIMITER = "\0";
+const int COMMAND_PART = 0;
+const int HEADERS_PART = 1;
+const int BODY_PART = 2;
+
 enum FrameCommand {
     SEND,
     MESSAGE,
@@ -32,6 +37,9 @@ class Frame {
         Frame();
         Frame(FrameCommand command);
         Frame(FrameCommand command, std::string body);
+        Frame(std::string& frameString);
+
+        FrameCommand static strToEnum(const std::string& str);
 
         FrameCommand getCommand();
         void setCommand(FrameCommand command);
