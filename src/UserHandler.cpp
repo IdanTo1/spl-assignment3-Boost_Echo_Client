@@ -8,17 +8,6 @@
 UserHandler::UserHandler(ConcurrentDataQueues& queues, ClientInventory& inventory) :
         _queues(queues), _inventory(inventory), _actionFrameCommandMap(initActionFrameCommandMap()) {}
 
-
-void UserHandler::run() {
-    while (true) {
-        const short bufSize = 1024;
-        char buf[bufSize];
-        std::cin.getline(buf, bufSize);
-        std::string line(buf);
-        parseLine(line);
-    }
-}
-
 UserActionsEnum UserHandler::findCmd(std::string line) {
     std::string cmd = line.substr(0, line.find(" "));
     if (cmd == "login") {
@@ -115,7 +104,7 @@ void UserHandler::joinGenre(std::string& line) {
     Frame ans = receiveFrame();
     FrameCommand ansCmd = ans.getCommand();
     if (ansCmd == RECEIPT) {
-        std::cout << "Joined club" + genre << std::endl;
+        std::cout << "Joined club " + genre << std::endl;
     }
     else if (ansCmd == ERROR) {
         std::cout << ans.getBody() << std::endl;
@@ -137,7 +126,7 @@ void UserHandler::exitGenre(std::string& line) {
     Frame ans = receiveFrame();
     FrameCommand ansCmd = ans.getCommand();
     if (ansCmd == RECEIPT) {
-        std::cout << "Exited club" + genre << std::endl;
+        std::cout << "Exited club " + genre << std::endl;
     }
     else if (ansCmd == ERROR) {
         std::cout << ans.getBody() << std::endl;
@@ -152,7 +141,7 @@ void UserHandler::addBook(std::string& line) {
 
     Frame frame = Frame(_actionFrameCommandMap[ADD_BOOK]);
     frame.addHeader("destination", genre);
-    frame.setBody(_inventory.getUsername() + "has added the book" + book);
+    frame.setBody(_inventory.getUsername() + " has added the book " + book);
     sendFrame(frame);
     _inventory.addBook(genre, book);
 }
@@ -177,7 +166,7 @@ void UserHandler::returnBook(std::string& line) {
 
     Frame frame = Frame(_actionFrameCommandMap[RETURN_BOOK]);
     frame.addHeader("destination", genre);
-    frame.setBody("Returning" + book + "to" + _inventory.returnBook(book));
+    frame.setBody("Returning " + book + " to " + _inventory.returnBook(book));
     sendFrame(frame);
 }
 
@@ -205,6 +194,10 @@ void UserHandler::logout(std::string& line) {
 }
 
 void UserHandler::parseLine(std::string line) {
+    if (line == "bye") {
+        _shouldTerminate = true;
+        return;
+    }
     UserActionsEnum cmd = findCmd(line);
     switch (cmd) {
         case LOGIN: {
@@ -237,5 +230,15 @@ void UserHandler::parseLine(std::string line) {
         }
         default: // Logout
             logout(line);
+    }
+}
+
+void UserHandler::run() {
+    while (!_shouldTerminate) {
+        const short bufSize = 1024;
+        char buf[bufSize];
+        std::cin.getline(buf, bufSize);
+        std::string line(buf);
+        parseLine(line);
     }
 }

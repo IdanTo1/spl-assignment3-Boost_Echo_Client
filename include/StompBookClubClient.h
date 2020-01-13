@@ -5,6 +5,7 @@
 #ifndef BOOST_ECHO_CLIENT_STOMPBOOKCLUBCLIENT_H
 #define BOOST_ECHO_CLIENT_STOMPBOOKCLUBCLIENT_H
 
+#include "UserHandler.h"
 
 class StompBookClubClient {
 

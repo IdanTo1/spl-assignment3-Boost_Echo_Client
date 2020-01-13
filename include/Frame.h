@@ -41,13 +41,13 @@ class Frame {
 
         FrameCommand static strToEnum(const std::string& str);
 
-        FrameCommand getCommand();
+        const FrameCommand getCommand() const;
         void setCommand(FrameCommand command);
-        std::string getBody();
+        const std::string getBody() const;
         void setBody(std::string body);
-        std::map <std::string, std::string> getHeaders();
+        const std::map <std::string, std::string> getHeaders() const;
         void addHeader(std::string header, std::string value);
-        std::string getHeaderVal(std::string header);
+        const std::string getHeaderVal(const std::string& header) const;
         std::string toString();
 
 };

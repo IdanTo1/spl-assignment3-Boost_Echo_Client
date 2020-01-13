@@ -26,6 +26,7 @@ enum UserActionsEnum {
 
 class UserHandler {
     private:
+        bool _shouldTerminate = false;
         ConcurrentDataQueues& _queues;
         ClientInventory& _inventory;
         std::map <UserActionsEnum, FrameCommand> _actionFrameCommandMap;

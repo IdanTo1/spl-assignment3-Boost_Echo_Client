@@ -75,7 +75,7 @@ Frame::Frame(std::string& frameString) {
     _body = frameString.substr(start, frameString.size() - start); // no need for last char in body
 }
 
-FrameCommand Frame::getCommand() {
+const FrameCommand Frame::getCommand() const {
     return _command;
 }
 
@@ -83,7 +83,7 @@ void Frame::setCommand(FrameCommand command) {
     _command = command;
 }
 
-std::string Frame::getBody() {
+const std::string Frame::getBody() const {
     return _body;
 }
 
@@ -91,7 +91,7 @@ void Frame::setBody(std::string body) {
     _body = body;
 }
 
-std::map <std::string, std::string> Frame::getHeaders() {
+const std::map <std::string, std::string> Frame::getHeaders() const {
     return _headers;
 }
 
@@ -99,6 +99,6 @@ void Frame::addHeader(std::string header, std::string value) {
     _headers[header] = value;
 }
 
-std::string Frame::getHeaderVal(std::string header) {
-    return _headers[header];
+const std::string Frame::getHeaderVal(const std::string& header) const {
+    return _headers.at(header);
 }
