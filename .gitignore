@@ -37,3 +37,4 @@
 #all output files
 bin/*
 #project files
+*.txt
