@@ -88,7 +88,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
     std::string body = messageFrame.getBody();
     split(body, subStrs, " ");
     if (subStrs[1] == "wish") {
-        std::string book = extractBookName(subStrs, 3, subStrs.size()); // starting from the word 'borrow'
+        std::string book = extractBookName(subStrs, 4, subStrs.size()); // starting from the word 'borrow'
         if (_inventory.isInInventory(genre, book)) {
             Frame ansFrame = Frame(SEND);
             ansFrame.addHeader("destination", genre);
