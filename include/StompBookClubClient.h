@@ -6,6 +6,9 @@
 #define BOOST_ECHO_CLIENT_STOMPBOOKCLUBCLIENT_H
 
 #include "UserHandler.h"
+#include "ConnectionHandler.h"
+#include "ServerHandler.h"
+
 
 class StompBookClubClient {
 

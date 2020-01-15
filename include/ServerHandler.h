@@ -6,6 +6,7 @@
 #define BOOST_ECHO_CLIENT_SERVERHANDLER_H
 
 #include <algorithm>
+#include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include "Frame.h"
 #include "ConcurrentDataQueues.h"
@@ -15,6 +16,7 @@
 
 class ServerHandler {
     private:
+        bool _shouldTerminate = false;
         ConnectionHandler* _connectionHandler;
         ConcurrentDataQueues& _queues;
         ClientInventory& _inventory;
@@ -30,10 +32,11 @@ class ServerHandler {
         Frame stringToFrame(Frame frameString);
     public:
         ServerHandler(ConcurrentDataQueues& queues, ClientInventory& inventory);
-        ServerHandler(const ServerHandler&) = delete;
-        ServerHandler operator=(const ServerHandler&) = delete;
+        ServerHandler(const ServerHandler& other) = delete;
+        ServerHandler operator=(const ServerHandler& other) = delete;
+        void terminate();
         ~ServerHandler();
-        void run();
+        void operator()();
 };
 
 
