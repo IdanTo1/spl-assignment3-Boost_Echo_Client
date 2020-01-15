@@ -52,20 +52,28 @@ void ServerHandler::parseUserFrame(Frame frameFromClient) {
     FrameCommand cmd = frameFromClient.getCommand();
     switch (cmd) {
         case CONNECT: {
+            if (_loggedIn) {
+                Frame frame = Frame(ERROR, "already logged in. you should logout before logging in again");
+                sendFrameToClient(frame);
+                return;
+            }
             std::string host = frameFromClient.getHeaderVal("host");
             short port = boost::lexical_cast<short>(frameFromClient.getHeaderVal("port"));
             _connectionHandler = new ConnectionHandler(host, port);
             if (!_connectionHandler->connect()) {
                 Frame frame = Frame(ERROR, "Could not connect to server");
+                sendFrameToClient(frame);
             }
             else {
                 _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
+                _loggedIn = true;
             }
             break;
         }
         case DISCONNECT: {
             _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
             delete _connectionHandler;
+            _loggedIn = false;
         }
         default:
             _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);

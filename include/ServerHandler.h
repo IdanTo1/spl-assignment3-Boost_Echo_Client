@@ -17,6 +17,7 @@
 class ServerHandler {
     private:
         bool _shouldTerminate = false;
+        bool _loggedIn = false;
         ConnectionHandler* _connectionHandler;
         ConcurrentDataQueues& _queues;
         ClientInventory& _inventory;
