@@ -5,6 +5,11 @@
 #include "../include/ClientInventory.h"
 
 
+ClientInventory::ClientInventory(std::map <std::string, std::vector<std::string>>& inventory,
+                                 std::map <std::string, std::string>& borrowMap,
+                                 std::map <std::string, std::vector<std::string>>& wishList) :
+        _inventory(inventory), _borrowMap(borrowMap), _wishList(wishList) {}
+
 void ClientInventory::addBook(std::string genre, std::string book) {
     boost::lock_guard <boost::mutex> lock(_inventoryMutex);
     _inventory[genre].push_back(book);

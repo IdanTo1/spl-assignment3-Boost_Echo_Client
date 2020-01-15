@@ -6,7 +6,8 @@
 
 
 UserHandler::UserHandler(ConcurrentDataQueues& queues, ClientInventory& inventory) :
-        _queues(queues), _inventory(inventory), _actionFrameCommandMap(initActionFrameCommandMap()) {}
+        _queues(queues), _inventory(inventory), _actionFrameCommandMap(initActionFrameCommandMap()),
+        _genreIdMap() {}
 
 UserActionsEnum UserHandler::findCmd(std::string line) {
     std::string cmd = line.substr(0, line.find(" "));
