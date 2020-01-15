@@ -5,7 +5,6 @@
 #include "../include/StompBookClubClient.h"
 
 int main(int argc, char* argv[]) {
-    std::cout << "i'm in main" << std::endl;
     std::queue <Frame>* frameToServer = new std::queue<Frame>;
     std::queue <Frame>* frameFromServer = new std::queue<Frame>;
     ConcurrentDataQueues queues(frameToServer, frameFromServer);
@@ -21,12 +20,11 @@ int main(int argc, char* argv[]) {
     ServerHandler serverHandler(queues, clientInventory);
 
     boost::thread userHandlerTh(&UserHandler::run, &userHandler);
-    std::cout << "started threads" << std::endl;
-//    boost::thread serverHandlerTh(&ServerHandler::run, &serverHandler);
+    boost::thread serverHandlerTh(&ServerHandler::run, &serverHandler);
 
     userHandlerTh.join();
     serverHandler.terminate();
-//    serverHandlerTh.join();
+    serverHandlerTh.join();
     delete frameToServer;
     delete frameFromServer;
     delete inventory;

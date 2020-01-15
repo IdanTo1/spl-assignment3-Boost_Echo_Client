@@ -169,6 +169,8 @@ void ServerHandler::run() {
         while ((frameFromClient = receiveFrameFromClient()).getCommand() != UNINITIALIZED) {
             parseUserFrame(frameFromClient);
         }
-        parseServerFrame();
+        if (_loggedIn) {
+            parseServerFrame();
+        }
     }
 }

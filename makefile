@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -c -g -Wall -Weffc++ -std=c++11
-LFLAGS = -lboost_system -pthread -L/usr/libc
+LFLAGS = -lboost_system -lboost_thread -pthread -L/usr/libc
 
 # All Targets
 all: StompBookClubClient

@@ -77,6 +77,31 @@ FrameCommand Frame::strToEnum(const std::string& str) {
     }
 }
 
+std::string Frame::enumToStr(const FrameCommand cmd) {
+    switch (cmd) {
+        case SEND:
+            return "SEND";
+        case MESSAGE:
+            return "MESSAGE";
+        case CONNECT:
+            return "CONNECT";
+        case CONNECTED:
+            return "CONNECTED";
+        case RECEIPT:
+            return "RECEIPT";
+        case ERROR:
+            return "ERROR";
+        case SUBSCRIBE:
+            return "SUBSCRIBE";
+        case UNSUBSCRIBE:
+            return "UNSUBSCRIBE";
+        case DISCONNECT:
+            return "DISCONNECT";
+        default:
+            return "UNINITIALIZED";
+    }
+}
+
 const FrameCommand Frame::getCommand() const {
     return _command;
 }
@@ -106,7 +131,7 @@ const std::string Frame::getHeaderVal(const std::string& header) const {
 }
 
 std::string Frame::toString() {
-    std::string frameString = _command + "\n";
+    std::string frameString = enumToStr(_command) + "\n";
     for (auto header : _headers) {
         frameString += (header.first + ":" + header.second + "\n");
     }

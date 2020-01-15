@@ -67,7 +67,7 @@ void UserHandler::login(std::string& line) {
     split(line, cmdParams, CMD_DELIMITER);
     size_t portSeparator = cmdParams[1].find(":");
     std::string host = cmdParams[1].substr(0, portSeparator);
-    std::string port = cmdParams[1].substr(portSeparator, cmdParams[1].size());
+    std::string port = cmdParams[1].substr(portSeparator + 1, cmdParams[1].size());
     std::string username = cmdParams[2];
     _inventory.setUsername(username);
     std::string password = cmdParams[3];
