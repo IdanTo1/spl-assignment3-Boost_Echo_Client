@@ -4,7 +4,6 @@
 
 #include "../include/Frame.h"
 
-
 Frame::Frame() : _headers() {}
 
 Frame::Frame(FrameCommand command) : _command(command), _headers() {}
@@ -12,12 +11,12 @@ Frame::Frame(FrameCommand command) : _command(command), _headers() {}
 Frame::Frame(FrameCommand command, std::string body) : _command(command), _headers(), _body(body) {}
 
 Frame::Frame(std::string& frameString) : _headers() {
-    std::string line = "";
+    std::string line;
     std::string delimiter = "\n";
     int framePart = COMMAND_PART;
     size_t start = 0U;
     size_t end = frameString.find(delimiter);
-    while (line != STOMP_DELIMITER && framePart != BODY_PART) {
+    do {
         line = frameString.substr(start, end - start);
         start = end + delimiter.length();
         end = line.find(delimiter, start);
@@ -39,7 +38,7 @@ Frame::Frame(std::string& frameString) : _headers() {
             default:
                 break; // will never happen.
         }
-    }
+    } while (line != STOMP_DELIMITER && framePart != BODY_PART);
     start = end + delimiter.length();
     _body = frameString.substr(start, frameString.size() - start); // no need for last char in body
 }
