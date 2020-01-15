@@ -1,16 +1,14 @@
 CC = g++
 CFLAGS = -c -g -Wall -Weffc++ -std=c++11
-LFLAGS = -lboost_system -pthread -L/usr/lib
+LFLAGS = -lboost_system -pthread -L/usr/libc
 
 # All Targets
 all: StompBookClubClient
 
-# $(CC) -o bin/splflix bin/Session.o bin/Watchable.o bin/User.o bin/PopularTag.o bin/Action.o bin/Main.o \
-# 		$(LFLAGS)
 # Linker
 StompBookClubClient: bin/StompBookClubClient.o
-	$(CC) -o bin/StompBookClubClient bin/StompBookClubClient.o bin/ConnectionHandler.o bin/UserHandler.o bin/ServerHandler.o \
-		bin/ConcurrentDataQueues.o bin/Frame.o bin/ClientInventory.o $(LFLAGS)
+	$(CC) -o bin/StompBookClubClient bin/StompBookClubClient.o bin/ConnectionHandler.o bin/UserHandler.o \
+		bin/ServerHandler.o bin/ConcurrentDataQueues.o bin/Frame.o bin/ClientInventory.o $(LFLAGS)
 
 # Source Files
 bin/StompBookClubClient.o: src/StompBookClubClient.cpp include/StompBookClubClient.h \
