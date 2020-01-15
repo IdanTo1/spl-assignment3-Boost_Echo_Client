@@ -163,7 +163,7 @@ void ServerHandler::terminate() {
     _shouldTerminate = true;
 }
 
-void ServerHandler::operator()() {
+void ServerHandler::run() {
     Frame frameFromClient;
     while (!_shouldTerminate) {
         while ((frameFromClient = receiveFrameFromClient()).getCommand() != UNINITIALIZED) {

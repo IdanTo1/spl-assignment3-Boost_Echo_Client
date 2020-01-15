@@ -22,7 +22,8 @@ bin/ServerHandler.o: src/ServerHandler.cpp include/ServerHandler.h bin/Concurren
 	bin/ClientInventory.o bin/ConnectionHandler.o
 	$(CC) $(CFLAGS) -o bin/ServerHandler.o src/ServerHandler.cpp
 
-bin/UserHandler.o: src/UserHandler.cpp include/UserHandler.h bin/ConcurrentDataQueues.o bin/Frame.o bin/ClientInventory.o
+bin/UserHandler.o: src/UserHandler.cpp include/UserHandler.h bin/ConcurrentDataQueues.o bin/Frame.o \
+	bin/ClientInventory.o
 	$(CC) $(CFLAGS) -o bin/UserHandler.o src/UserHandler.cpp
 
 bin/ConcurrentDataQueues.o: src/ConcurrentDataQueues.cpp include/ConcurrentDataQueues.h bin/Frame.o

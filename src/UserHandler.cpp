@@ -234,7 +234,7 @@ void UserHandler::parseLine(std::string line) {
     }
 }
 
-void UserHandler::operator()() {
+void UserHandler::run() {
     while (!_shouldTerminate) {
         const short bufSize = 1024;
         char buf[bufSize];

@@ -37,7 +37,7 @@ class ServerHandler {
         ServerHandler operator=(const ServerHandler& other) = delete;
         void terminate();
         ~ServerHandler();
-        void operator()();
+        void run();
 };
 
 
