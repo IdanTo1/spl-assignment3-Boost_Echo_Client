@@ -104,3 +104,13 @@ void Frame::addHeader(std::string header, std::string value) {
 const std::string Frame::getHeaderVal(const std::string& header) const {
     return _headers.at(header);
 }
+
+std::string Frame::toString() {
+    std::string frameString = _command + "\n";
+    for (auto header : _headers) {
+        frameString += (header.first + ":" + header.second + "\n");
+    }
+    frameString += _body;
+    frameString += "\0";
+    return frameString;
+}
