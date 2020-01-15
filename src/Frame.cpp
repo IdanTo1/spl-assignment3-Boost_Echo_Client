@@ -5,6 +5,7 @@
 #include "../include/Frame.h"
 
 
+Frame::Frame() : _headers() {}
 
 Frame::Frame(FrameCommand command) : _command(command), _headers() {}
 
