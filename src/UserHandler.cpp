@@ -235,9 +235,9 @@ void UserHandler::parseLine(std::string line) {
 }
 
 void UserHandler::run() {
+    const short bufSize = 1024;
+    char buf[bufSize];
     while (!_shouldTerminate) {
-        const short bufSize = 1024;
-        char buf[bufSize];
         std::cin.getline(buf, bufSize);
         std::string line(buf);
         parseLine(line);
