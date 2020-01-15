@@ -11,13 +11,14 @@ StompBookClubClient: bin/StompBookClubClient.o
 
 # Source Files
 bin/StompBookClubClient.o: src/StompBookClubClient.cpp include/StompBookClubClient.h \
-		bin/ConnectionHandler.o bin/UserHandler.o bin/ServerHandler
+		bin/ConnectionHandler.o bin/UserHandler.o bin/ServerHandler.o
 	g++ $(CFLAGS) -o bin/StompBookClubClient.o src/StompBookClubClient.cpp
 
 bin/ConnectionHandler.o: src/ConnectionHandler.cpp include/ConnectionHandler.h
 	g++ $(CFLAGS) -o bin/ConnectionHandler.o src/ConnectionHandler.cpp
 
-bin/ServerHandler.o: src/ServerHandler.cpp include/ServerHandler.h bin/ConcurrentDataQueues.o bin/Frame.o bin/ClientInventory.o
+bin/ServerHandler.o: src/ServerHandler.cpp include/ServerHandler.h bin/ConcurrentDataQueues.o bin/Frame.o \
+	bin/ClientInventory.o bin/ConnectionHandler.o
 	g++ $(CFLAGS) -o bin/ServerHandler.o src/ServerHandler.cpp
 
 bin/UserHandler.o: src/UserHandler.cpp include/UserHandler.h bin/ConcurrentDataQueues.o bin/Frame.o bin/ClientInventory.o

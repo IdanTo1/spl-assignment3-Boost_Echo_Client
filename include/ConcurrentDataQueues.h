@@ -14,8 +14,9 @@ class ConcurrentDataQueues {
     public:
         std::queue <Frame> framesToServer, framesFromServer;
         boost::mutex mutexToServer, mutexFromServer;
-        boost::condition_variable condFromServer, condToServer;
+        boost::condition_variable condToServer, condFromServer;
 
+        ConcurrentDataQueues(std::queue <Frame>* framesToServer, std::queue <Frame>* frameFromServer);
 };
 
 
