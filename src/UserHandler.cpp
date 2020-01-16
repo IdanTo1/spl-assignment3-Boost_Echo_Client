@@ -192,6 +192,9 @@ void UserHandler::logout(std::string& line) {
     if (ansCmd == ERROR) {
         std::cout << ans.getBody() << std::endl;
     }
+    else {// ansCmd == RECEIPT
+        _inventory.clear();
+    }
 }
 
 void UserHandler::parseLine(std::string line) {

@@ -11,6 +11,15 @@ ClientInventory::ClientInventory(std::map <std::string, std::vector<std::string>
         _inventory(inventory), _borrowMap(borrowMap), _wishList(wishList),
         _inventoryMutex(), _borrowMutex(), _wishListMutex() {}
 
+void ClientInventory::clear() {
+    boost::lock_guard <boost::mutex> inventoryLock(_inventoryMutex);
+    boost::lock_guard <boost::mutex> borrowLock(_borrowMutex);
+    boost::lock_guard <boost::mutex> wishListLock(_wishListMutex);
+    _inventory.clear();
+    _borrowMap.clear();
+    _wishList.clear();
+}
+
 void ClientInventory::addBook(std::string genre, std::string book) {
     boost::lock_guard <boost::mutex> lock(_inventoryMutex);
     _inventory[genre].push_back(book);
