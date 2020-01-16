@@ -31,6 +31,11 @@ class ServerHandler {
         std::string extractBookName(std::vector <std::string> pieces, size_t startPos, size_t endPos);
         std::string booksString(std::vector <std::string> books);
         Frame stringToFrame(Frame frameString);
+
+
+        void listenToClient();
+        void listenToSocket();
+
     public:
         ServerHandler(ConcurrentDataQueues& queues, ClientInventory& inventory);
         ServerHandler(const ServerHandler& other) = delete;

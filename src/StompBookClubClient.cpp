@@ -4,6 +4,7 @@
 
 #include "../include/StompBookClubClient.h"
 
+
 int main(int argc, char* argv[]) {
     std::queue <Frame>* frameToServer = new std::queue<Frame>;
     std::queue <Frame>* frameFromServer = new std::queue<Frame>;
@@ -23,7 +24,9 @@ int main(int argc, char* argv[]) {
     boost::thread serverHandlerTh(&ServerHandler::run, &serverHandler);
 
     userHandlerTh.join();
+    std::cout << "userHandler Terminated" << std::endl << std::flush;
     serverHandler.terminate();
+    queues.condToServer.notify_all();
     serverHandlerTh.join();
     delete frameToServer;
     delete frameFromServer;

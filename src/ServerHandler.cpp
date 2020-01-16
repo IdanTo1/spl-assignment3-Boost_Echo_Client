@@ -13,8 +13,8 @@ ServerHandler::~ServerHandler() {
 }
 //
 //ServerHandler::ServerHandler(const ServerHandler& other) :
-//        _connectionHandler(nullptr), _queues(other._queues), _inventory(_inventory) {}
-//
+//        _connectionHandler(other._connectionHandler), _queues(other._queues), _inventory(other._inventory) {}
+
 //ServerHandler ServerHandler::operator=(const ServerHandler& other) {
 //    this->_connectionHandler = nullptr;
 //    this->_queues = other._queues;
@@ -163,14 +163,54 @@ void ServerHandler::terminate() {
     _shouldTerminate = true;
 }
 
+//void ServerHandler::run() {
+//    Frame frameFromClient;
+//    while (!_shouldTerminate) {
+//        while ((frameFromClient = receiveFrameFromClient()).getCommand() != UNINITIALIZED) {
+//            parseUserFrame(frameFromClient);
+//        }
+//        if (_loggedIn) {
+//            parseServerFrame();
+//        }
+//    }
+//}
+
 void ServerHandler::run() {
-    Frame frameFromClient;
+//    boost::thread listenToClientTh(&ServerHandler::listenToClient, this);
+    boost::thread listenToSocketTh(&ServerHandler::listenToSocket, this);
+    listenToClient();
+    std::cout << "exited listening to client" << std::endl << std::flush;
+    listenToSocketTh.join();
+    std::cout << "exited listening to socket" << std::endl << std::flush;
+
+}
+
+void ServerHandler::listenToClient() {
     while (!_shouldTerminate) {
-        while ((frameFromClient = receiveFrameFromClient()).getCommand() != UNINITIALIZED) {
-            parseUserFrame(frameFromClient);
+        boost::unique_lock <boost::mutex> lock(_queues.mutexToServer);
+        while (_queues.framesToServer.empty() && !_shouldTerminate) _queues.condToServer.wait(lock);
+        std::cout << "exited block" << std::endl << std::flush;
+        if (_shouldTerminate) {
+            std::cout << "listenToClient should terminate" << std::endl << std::flush;
+            printf("client's pointer is %p\n", _connectionHandler);
+            delete _connectionHandler;
+            return;
         }
-        if (_loggedIn) {
-            parseServerFrame();
+        Frame frameFromClient = _queues.framesToServer.front();
+        _queues.framesToServer.pop();
+        parseUserFrame(frameFromClient);
+    }
+}
+
+void ServerHandler::listenToSocket() {
+    while (!_shouldTerminate) {
+//        printf("socket's pointer is %p\n", _connectionHandler);
+        try {
+            if (_loggedIn) {
+                parseServerFrame();
+            }
+        } catch (std::exception& e) {
+            return;
         }
     }
 }
