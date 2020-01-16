@@ -3,6 +3,7 @@
 //
 
 #include "../include/StompBookClubClient.h"
+#include <thread>
 
 
 int main(int argc, char* argv[]) {
@@ -20,8 +21,8 @@ int main(int argc, char* argv[]) {
     UserHandler userHandler(queues, clientInventory);
     ServerHandler serverHandler(queues, clientInventory);
 
-    boost::thread userHandlerTh(&UserHandler::run, &userHandler);
-    boost::thread serverHandlerTh(&ServerHandler::run, &serverHandler);
+    std::thread userHandlerTh(&UserHandler::run, &userHandler);
+    std::thread serverHandlerTh(&ServerHandler::run, &serverHandler);
 
     userHandlerTh.join();
     serverHandler.terminate();
