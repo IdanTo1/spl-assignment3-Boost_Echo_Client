@@ -187,7 +187,6 @@ void ServerHandler::listenToClient() {
     while (!_shouldTerminate) {
         boost::unique_lock <boost::mutex> lock(_queues.mutexToServer);
         while (_queues.framesToServer.empty() && !_shouldTerminate) _queues.condToServer.wait(lock);
-        std::cout << "exited block" << std::endl << std::flush;
         if (_shouldTerminate) {
             delete _connectionHandler;
             return;
@@ -200,13 +199,7 @@ void ServerHandler::listenToClient() {
 
 void ServerHandler::listenToSocket() {
     while (!_shouldTerminate) {
-//        printf("socket's pointer is %p\n", _connectionHandler);
-        try {
-            if (_loggedIn) {
-                parseServerFrame();
-            }
-        } catch (std::exception& e) {
-            return;
+        if (_loggedIn) {
+            parseServerFrame();
         }
     }
-}
