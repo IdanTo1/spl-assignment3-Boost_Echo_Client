@@ -179,9 +179,7 @@ void ServerHandler::run() {
 //    boost::thread listenToClientTh(&ServerHandler::listenToClient, this);
     boost::thread listenToSocketTh(&ServerHandler::listenToSocket, this);
     listenToClient();
-    std::cout << "exited listening to client" << std::endl << std::flush;
     listenToSocketTh.join();
-    std::cout << "exited listening to socket" << std::endl << std::flush;
 
 }
 
@@ -191,8 +189,6 @@ void ServerHandler::listenToClient() {
         while (_queues.framesToServer.empty() && !_shouldTerminate) _queues.condToServer.wait(lock);
         std::cout << "exited block" << std::endl << std::flush;
         if (_shouldTerminate) {
-            std::cout << "listenToClient should terminate" << std::endl << std::flush;
-            printf("client's pointer is %p\n", _connectionHandler);
             delete _connectionHandler;
             return;
         }

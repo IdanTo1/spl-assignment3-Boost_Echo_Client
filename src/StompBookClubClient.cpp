@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
     boost::thread serverHandlerTh(&ServerHandler::run, &serverHandler);
 
     userHandlerTh.join();
-    std::cout << "userHandler Terminated" << std::endl << std::flush;
     serverHandler.terminate();
     queues.condToServer.notify_all();
     serverHandlerTh.join();
