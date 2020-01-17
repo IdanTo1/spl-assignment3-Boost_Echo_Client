@@ -124,6 +124,7 @@ void UserHandler::exitGenre(std::string& line) {
     Frame frame(_actionFrameCommandMap[EXIT_GENRE]);
     frame.addHeader("id", std::to_string(genreId));
     frame.addHeader("receipt", std::to_string(genreId));
+    frame.addHeader("destination", genre);
     sendFrame(frame);
 
     Frame ans = receiveFrame();
