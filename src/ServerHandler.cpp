@@ -75,6 +75,7 @@ void ServerHandler::parseUserFrame(Frame frameFromClient) {
             }
             _loggedIn = false;
             _shouldTerminate = true;
+            delete _connectionHandler;
             break;
         }
         default:

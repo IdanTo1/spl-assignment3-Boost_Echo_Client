@@ -12,9 +12,7 @@ using std::string;
 ConnectionHandler::ConnectionHandler(string host, short port) :
         host_(host), port_(port), io_service_(), socket_(io_service_), isOpen(false) {}
 
-ConnectionHandler::~ConnectionHandler() {
-    close();
-}
+ConnectionHandler::~ConnectionHandler() = default;
 
 bool ConnectionHandler::connect() {
     std::cout << "Starting connect to "
