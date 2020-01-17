@@ -24,6 +24,7 @@ Frame::Frame(std::string& frameString) : _headers() {
             case COMMAND_PART: {
                 _command = strToEnum(line);
                 framePart = HEADERS_PART;
+                break;
             }
             case HEADERS_PART: {
                 size_t portSeparator = line.find(":");
@@ -134,6 +135,7 @@ std::string Frame::toString() {
     for (auto header : _headers) {
         frameString += (header.first + ":" + header.second + "\n");
     }
+    frameString += "\n";
     frameString += _body;
     frameString += "\0";
     return frameString;

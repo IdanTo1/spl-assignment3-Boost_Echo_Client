@@ -132,6 +132,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
         ansFrame.setBody(body);
         _connectionHandler->sendFrameAscii(ansFrame.toString(), STOMP_DELIMITER.c_str()[0]);
     }
+    else if(subStrs[0] == _inventory.getUsername()) return;
     else if (subStrs[1] == "has") {
         std::string book = extractBookName(subStrs, 2, subStrs.size()); //staring after the word 'has'
         if (_inventory.isInWishList(genre, book)) {
