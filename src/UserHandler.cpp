@@ -142,6 +142,9 @@ void UserHandler::addBook(std::string& line) {
     split(line, cmdParams, CMD_DELIMITER);
     std::string genre = cmdParams[1];
     std::string book = cmdParams[2];
+    for(int i = 3; i < cmdParams.size(); i++) {
+        book += cmdParams[i];
+    }
 
     Frame frame = Frame(_actionFrameCommandMap[ADD_BOOK]);
     frame.addHeader("destination", genre);
@@ -197,7 +200,10 @@ void UserHandler::logout(std::string& line) {
     }
     else {// ansCmd == RECEIPT
         _inventory.clear();
+        while(!_queues.framesFromServer.empty()) _queues.framesFromServer.pop();
+        std::cout << "Disconnected from server" << std::endl;
     }
+
 }
 
 void UserHandler::parseLine(std::string line) {

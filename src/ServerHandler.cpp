@@ -71,11 +71,9 @@ void ServerHandler::parseUserFrame(Frame frameFromClient) {
         case DISCONNECT: {
             if(_loggedIn) {
                 _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
-                _connectionHandler->close();
             }
             _loggedIn = false;
-            _shouldTerminate = true;
-            delete _connectionHandler;
+
             break;
         }
         default:
@@ -150,12 +148,20 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
 
 void ServerHandler::parseServerFrame() {
     std::string frameString;
-    if(!_connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0])) return;
+    while(_connectionHandler == nullptr || !_connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0])) {
+        if(_shouldTerminate) return;
+    }
     Frame frame = Frame(frameString);
     FrameCommand cmd = frame.getCommand();
+    if(!_loggedIn && cmd == RECEIPT) {
+        delete _connectionHandler;
+        _connectionHandler = nullptr;
+        sendFrameToClient(frame);
+    }
     switch (cmd) {
         case MESSAGE: {
             parseMessageFrame(frame);
+            break;
         }
         default: { // CONNECTED, RECEIPT, and ERROR frames, should be passed to user.
             sendFrameToClient(frame);
@@ -191,6 +197,7 @@ void ServerHandler::listenToClient() {
     while (!_shouldTerminate) {
         boost::unique_lock <boost::mutex> lock(_queues.mutexToServer);
         while (_queues.framesToServer.empty() && !_shouldTerminate) _queues.condToServer.wait(lock);
+        if(_shouldTerminate) return;
         Frame frameFromClient = _queues.framesToServer.front();
         _queues.framesToServer.pop();
         parseUserFrame(frameFromClient);
