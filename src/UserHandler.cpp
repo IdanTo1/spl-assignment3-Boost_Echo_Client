@@ -51,6 +51,8 @@ void UserHandler::split(std::string& line, std::vector <std::string>& cmdParams,
 Frame UserHandler::receiveFrame() {
     boost::unique_lock <boost::mutex> lock(_queues.mutexFromServer);
     while (_queues.framesFromServer.empty()) _queues.condFromServer.wait(lock);
+    // Frame is a small object and creating an empty one isn't a big load on the client
+    if(_shouldTerminate) return Frame();
     Frame ans = _queues.framesFromServer.front();
     _queues.framesFromServer.pop();
     return ans;
@@ -200,6 +202,7 @@ void UserHandler::logout(std::string& line) {
 void UserHandler::parseLine(std::string line) {
     if (line == "bye") {
         _shouldTerminate = true;
+        sendFrame(Frame(_actionFrameCommandMap[LOGOUT]));
         return;
     }
     UserActionsEnum cmd = findCmd(line);

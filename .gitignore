@@ -40,3 +40,4 @@ bin/*
 *.txt
 cmake-build-debug
 testing
+*.json

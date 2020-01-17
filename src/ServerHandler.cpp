@@ -8,9 +8,7 @@
 ServerHandler::ServerHandler(ConcurrentDataQueues& queues, ClientInventory& inventory) :
         _connectionHandler(nullptr), _queues(queues), _inventory(inventory) {}
 
-ServerHandler::~ServerHandler() {
-    delete _connectionHandler;
-}
+ServerHandler::~ServerHandler() = default;
 //
 //ServerHandler::ServerHandler(const ServerHandler& other) :
 //        _connectionHandler(other._connectionHandler), _queues(other._queues), _inventory(other._inventory) {}
@@ -71,9 +69,13 @@ void ServerHandler::parseUserFrame(Frame frameFromClient) {
             break;
         }
         case DISCONNECT: {
-            _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
-            delete _connectionHandler;
+            if(_loggedIn) {
+                _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
+                _connectionHandler->close();
+            }
             _loggedIn = false;
+            _shouldTerminate = true;
+            break;
         }
         default:
             _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
@@ -146,7 +148,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
 
 void ServerHandler::parseServerFrame() {
     std::string frameString;
-    _connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0]);
+    if(!_connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0])) return;
     Frame frame = Frame(frameString);
     FrameCommand cmd = frame.getCommand();
     switch (cmd) {
@@ -187,10 +189,6 @@ void ServerHandler::listenToClient() {
     while (!_shouldTerminate) {
         boost::unique_lock <boost::mutex> lock(_queues.mutexToServer);
         while (_queues.framesToServer.empty() && !_shouldTerminate) _queues.condToServer.wait(lock);
-        if (_shouldTerminate) {
-            delete _connectionHandler;
-            return;
-        }
         Frame frameFromClient = _queues.framesToServer.front();
         _queues.framesToServer.pop();
         parseUserFrame(frameFromClient);
@@ -203,3 +201,4 @@ void ServerHandler::listenToSocket() {
             parseServerFrame();
         }
     }
+}

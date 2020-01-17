@@ -10,7 +10,7 @@ using std::endl;
 using std::string;
 
 ConnectionHandler::ConnectionHandler(string host, short port) :
-        host_(host), port_(port), io_service_(), socket_(io_service_) {}
+        host_(host), port_(port), io_service_(), socket_(io_service_), isOpen(false) {}
 
 ConnectionHandler::~ConnectionHandler() {
     close();
@@ -26,6 +26,7 @@ bool ConnectionHandler::connect() {
         if (error) {
             throw boost::system::system_error(error);
         }
+        isOpen = true;
     }
     catch (std::exception& e) {
         std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
@@ -41,6 +42,7 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
         while (!error && bytesToRead > tmp) {
             tmp += socket_.read_some(boost::asio::buffer(bytes + tmp, bytesToRead - tmp), error);
         }
+        if(!isOpen) return false;
         if (error) {
             throw boost::system::system_error(error);
         }
@@ -107,6 +109,7 @@ bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter)
 // Close down the connection properly.
 void ConnectionHandler::close() {
     try {
+        isOpen = false;
         socket_.close();
     } catch (...) {
         std::cout << "closing failed: connection already closed" << std::endl;
