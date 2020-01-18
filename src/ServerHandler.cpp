@@ -9,15 +9,6 @@ ServerHandler::ServerHandler(ConcurrentDataQueues& queues, ClientInventory& inve
         _connectionHandler(nullptr), _queues(queues), _inventory(inventory) {}
 
 ServerHandler::~ServerHandler() = default;
-//
-//ServerHandler::ServerHandler(const ServerHandler& other) :
-//        _connectionHandler(other._connectionHandler), _queues(other._queues), _inventory(other._inventory) {}
-
-//ServerHandler ServerHandler::operator=(const ServerHandler& other) {
-//    this->_connectionHandler = nullptr;
-//    this->_queues = other._queues;
-//    this->_inventory = other._inventory;
-//}
 
 void ServerHandler::split(std::string& str, std::vector <std::string>& subStrs, std::string delimiter) {
     size_t start = 0U;
@@ -173,20 +164,7 @@ void ServerHandler::terminate() {
     _shouldTerminate = true;
 }
 
-//void ServerHandler::run() {
-//    Frame frameFromClient;
-//    while (!_shouldTerminate) {
-//        while ((frameFromClient = receiveFrameFromClient()).getCommand() != UNINITIALIZED) {
-//            parseUserFrame(frameFromClient);
-//        }
-//        if (_loggedIn) {
-//            parseServerFrame();
-//        }
-//    }
-//}
-
 void ServerHandler::run() {
-//    boost::thread listenToClientTh(&ServerHandler::listenToClient, this);
     boost::thread listenToSocketTh(&ServerHandler::listenToSocket, this);
     listenToClient();
     listenToSocketTh.join();
