@@ -142,7 +142,7 @@ void UserHandler::addBook(std::string& line) {
     split(line, cmdParams, CMD_DELIMITER);
     std::string genre = cmdParams[1];
     std::string book = cmdParams[2];
-    for(int i = 3; i < cmdParams.size(); i++) {
+    for(uint i = 3; i < cmdParams.size(); i++) {
         book += cmdParams[i];
     }
 
@@ -200,6 +200,7 @@ void UserHandler::logout(std::string& line) {
     }
     else {// ansCmd == RECEIPT
         _inventory.clear();
+        boost::unique_lock <boost::mutex> lock(_queues.mutexFromServer);
         while(!_queues.framesFromServer.empty()) _queues.framesFromServer.pop();
         std::cout << "Disconnected from server" << std::endl;
     }
@@ -209,7 +210,6 @@ void UserHandler::logout(std::string& line) {
 void UserHandler::parseLine(std::string line) {
     if (line == "bye") {
         _shouldTerminate = true;
-        sendFrame(Frame(_actionFrameCommandMap[LOGOUT]));
         return;
     }
     UserActionsEnum cmd = findCmd(line);
