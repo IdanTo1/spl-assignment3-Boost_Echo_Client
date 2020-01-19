@@ -200,7 +200,7 @@ void UserHandler::logout(std::string& line) {
     }
     else {// ansCmd == RECEIPT
         _inventory.clear();
-        boost::unique_lock <boost::mutex> lock(_queues.mutexFromServer);
+        boost::lock_guard <boost::mutex> lock(_queues.mutexFromServer);
         while(!_queues.framesFromServer.empty()) _queues.framesFromServer.pop();
         std::cout << "Disconnected from server" << std::endl;
     }
