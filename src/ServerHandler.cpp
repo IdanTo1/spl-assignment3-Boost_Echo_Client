@@ -95,6 +95,9 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
     std::vector <std::string> subStrs;
     std::string body = messageFrame.getBody();
     split(body, subStrs, " ");
+    if (subStrs.size() == 1) { // no spaces in name, meaning status
+        return;
+    }
     if (subStrs[1] == "wish" && subStrs[0] != _inventory.getUsername()) {
         std::string book = extractBookName(subStrs, 4, subStrs.size()); // starting from the word 'borrow'
         if (_inventory.isInInventory(genre, book)) {
