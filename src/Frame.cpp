@@ -40,7 +40,6 @@ Frame::Frame(std::string& frameString) : _headers() {
                 break; // will never happen.
         }
     } while (line != STOMP_DELIMITER && framePart != BODY_PART);
-    start = end + delimiter.length();
     _body = frameString.substr(start, frameString.size() - start); // no need for last char in body
 }
 
