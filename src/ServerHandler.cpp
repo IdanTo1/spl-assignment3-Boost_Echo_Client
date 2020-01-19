@@ -86,7 +86,7 @@ std::string ServerHandler::booksString(std::vector <std::string> books) {
         body += book;
         body += ",";
     }
-    body.substr(0, body.size() - 1); // instead of adding a check for last book, just remove last ','
+    body = body.substr(0, body.size() - 1); // instead of adding a check for last book, just remove last ','
     return body;
 }
 
@@ -115,9 +115,13 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
         _inventory.removeFromInventory(genre, book);
     }
     else if (body == "book status") {
+        std::vector <std::string> genreBooks = _inventory.getGenreBooks(genre);
+        if (genreBooks.empty()) {
+            return;
+        }
         Frame ansFrame = Frame(SEND);
         ansFrame.addHeader("destination", genre);
-        std::string body = booksString(_inventory.getGenreBooks(genre));
+        std::string body = booksString(genreBooks);
         ansFrame.setBody(body);
         _connectionHandler->sendFrameAscii(ansFrame.toString(), STOMP_DELIMITER.c_str()[0]);
     }
@@ -129,7 +133,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
             ansFrame.addHeader("destination", genre);
             ansFrame.setBody("Taking " + book + " from " + lender);
             _connectionHandler->sendFrameAscii(ansFrame.toString(), STOMP_DELIMITER.c_str()[0]);
-            _inventory.borrowBook(book, lender);
+            _inventory.borrowBook(genre, book, lender);
             _inventory.removeFromWishList(genre, book);
         }
     }

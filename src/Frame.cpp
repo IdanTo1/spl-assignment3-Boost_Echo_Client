@@ -16,6 +16,7 @@ Frame::Frame(std::string& frameString) : _headers() {
     int framePart = COMMAND_PART;
     size_t start = 0U;
     size_t end = frameString.find(delimiter);
+    size_t bodyIndex = frameString.find(delimiter+delimiter);
     do {
         line = frameString.substr(start, end - start);
         start = end + delimiter.length();
@@ -28,7 +29,7 @@ Frame::Frame(std::string& frameString) : _headers() {
             }
             case HEADERS_PART: {
                 size_t portSeparator = line.find(":");
-                if (portSeparator == std::string::npos) {
+                if (portSeparator == std::string::npos || portSeparator+start > bodyIndex) {
                     framePart = BODY_PART;
                     break;
                 }

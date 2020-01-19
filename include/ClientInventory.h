@@ -36,8 +36,8 @@ class ClientInventory {
         bool isInWishList(std::string genre, std::string book);
         void removeFromWishList(std::string genre, std::string book);
 
-        void borrowBook(std::string book, std::string lender);
-        std::string returnBook(std::string book);
+        void borrowBook(std::string genre, std::string book, std::string lender);
+        std::string returnBook(std::string genre, std::string book);
 };
 
 

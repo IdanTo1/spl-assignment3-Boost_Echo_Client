@@ -176,7 +176,7 @@ void UserHandler::returnBook(std::string& line) {
 
     Frame frame = Frame(_actionFrameCommandMap[RETURN_BOOK]);
     frame.addHeader("destination", genre);
-    frame.setBody("Returning " + book + " to " + _inventory.returnBook(book));
+    frame.setBody("Returning " + book + " to " + _inventory.returnBook(genre, book));
     sendFrame(frame);
 }
 

@@ -56,13 +56,15 @@ void ClientInventory::setUsername(std::string name) {
     _username = name;
 }
 
-void ClientInventory::borrowBook(std::string book, std::string lender) {
-    boost::lock_guard <boost::mutex> lock(_borrowMutex);
+void ClientInventory::borrowBook(std::string genre, std::string book, std::string lender) {
+    addBook(genre, book);
+    boost::lock_guard <boost::mutex> borrowLock(_borrowMutex);
     _borrowMap[book] = lender;
 }
 
-std::string ClientInventory::returnBook(std::string book) {
-    boost::lock_guard <boost::mutex> lock(_borrowMutex);
+std::string ClientInventory::returnBook(std::string genre, std::string book) {
+    removeFromInventory(genre, book);
+    boost::lock_guard <boost::mutex> borrowLock(_borrowMutex);
     std::string lender = _borrowMap.at(book);
     _borrowMap.erase(book);
     return lender;
