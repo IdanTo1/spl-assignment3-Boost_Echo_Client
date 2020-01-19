@@ -19,7 +19,7 @@ Frame::Frame(std::string& frameString) : _headers() {
     do {
         line = frameString.substr(start, end - start);
         start = end + delimiter.length();
-        end = line.find(delimiter, start);
+        end = frameString.find(delimiter, start);
         switch (framePart) {
             case COMMAND_PART: {
                 _command = strToEnum(line);
@@ -33,7 +33,7 @@ Frame::Frame(std::string& frameString) : _headers() {
                     break;
                 }
                 std::string header = line.substr(0, portSeparator);
-                std::string headerVal = line.substr(portSeparator + 1, line.size());
+                std::string headerVal = line.substr(portSeparator + 1, line.size() - portSeparator + 1);
                 _headers[header] = headerVal;
             }
             default:
