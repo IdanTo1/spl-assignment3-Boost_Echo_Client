@@ -141,8 +141,8 @@ void UserHandler::addBook(std::string& line) {
     std::vector <std::string> cmdParams;
     split(line, cmdParams, CMD_DELIMITER);
     std::string genre = cmdParams[1];
-    std::string book = cmdParams[2];
-    for(uint i = 3; i < cmdParams.size(); i++) {
+    std::string book = "";
+    for (uint i = 2; i < cmdParams.size(); i++) {
         book += cmdParams[i];
     }
 
@@ -157,8 +157,11 @@ void UserHandler::borrowBook(std::string& line) {
     std::vector <std::string> cmdParams;
     split(line, cmdParams, CMD_DELIMITER);
     std::string genre = cmdParams[1];
-    std::string book = cmdParams[2];
-
+    std::string book = "";
+    for (uint i = 2; i < cmdParams.size(); i++) {
+        book += cmdParams[i];
+    }
+    _inventory.addToWishList(genre, book);
     Frame frame = Frame(_actionFrameCommandMap[BORROW_BOOK]);
     frame.addHeader("destination", genre);
     frame.setBody(_inventory.getUsername() + " wish to borrow " + book);

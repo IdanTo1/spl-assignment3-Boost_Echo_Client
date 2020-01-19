@@ -19,7 +19,7 @@ Frame::Frame(std::string& frameString) : _headers() {
     do {
         line = frameString.substr(start, end - start);
         start = end + delimiter.length();
-        end = line.find(delimiter, start);
+        end = frameString.find(delimiter, start);
         switch (framePart) {
             case COMMAND_PART: {
                 _command = strToEnum(line);
@@ -30,17 +30,16 @@ Frame::Frame(std::string& frameString) : _headers() {
                 size_t portSeparator = line.find(":");
                 if (portSeparator == std::string::npos) {
                     framePart = BODY_PART;
-                    continue;
+                    break;
                 }
                 std::string header = line.substr(0, portSeparator);
-                std::string headerVal = line.substr(portSeparator, line.size());
+                std::string headerVal = line.substr(portSeparator + 1, line.size() - portSeparator + 1);
                 _headers[header] = headerVal;
             }
             default:
                 break; // will never happen.
         }
     } while (line != STOMP_DELIMITER && framePart != BODY_PART);
-    start = end + delimiter.length();
     _body = frameString.substr(start, frameString.size() - start); // no need for last char in body
 }
 

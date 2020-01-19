@@ -32,7 +32,7 @@ std::vector <std::string> ClientInventory::getGenreBooks(std::string genre) {
 
 bool ClientInventory::isInInventory(std::string genre, std::string book) {
     boost::lock_guard <boost::mutex> lock(_inventoryMutex);
-    std::vector <std::string> genreInventory = _inventory[genre];
+    std::vector <std::string> genreInventory = _inventory.at(genre);
     return (std::find(genreInventory.begin(), genreInventory.end(), book) != genreInventory.end());
 }
 
@@ -43,7 +43,7 @@ void ClientInventory::removeFromInventory(std::string genre, std::string book) {
     * in addition, an other client won't take a book from this client, if it didn't have it before.
     */
     boost::lock_guard <boost::mutex> lock(_inventoryMutex);
-    std::vector <std::string> genreInventory = _inventory[genre];
+    std::vector <std::string>& genreInventory = _inventory.at(genre);
     auto it = std::find(genreInventory.begin(), genreInventory.end(), book);
     genreInventory.erase(it);
 }
@@ -63,7 +63,7 @@ void ClientInventory::borrowBook(std::string book, std::string lender) {
 
 std::string ClientInventory::returnBook(std::string book) {
     boost::lock_guard <boost::mutex> lock(_borrowMutex);
-    std::string lender = _borrowMap[book];
+    std::string lender = _borrowMap.at(book);
     _borrowMap.erase(book);
     return lender;
 }
@@ -87,7 +87,7 @@ void ClientInventory::removeFromWishList(std::string genre, std::string book) {
     * this book, it will be in the wish list prior to the check.
     */
     boost::lock_guard <boost::mutex> lock(_wishListMutex);
-    std::vector <std::string> genreWishList = _wishList[genre];
+    std::vector <std::string>& genreWishList = _wishList.at(genre);
     auto it = std::find(genreWishList.begin(), genreWishList.end(), book);
     genreWishList.erase(it);
 }

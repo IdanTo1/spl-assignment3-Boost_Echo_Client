@@ -74,8 +74,7 @@ void ServerHandler::parseUserFrame(Frame frameFromClient) {
 
 std::string ServerHandler::extractBookName(std::vector <std::string> pieces, size_t startPos, size_t endPos) {
     std::string book;
-    // the || is unnecessary with right usage, added here only because the sake of style.
-    for (size_t i = startPos; i < endPos || i < pieces.size(); i++) {
+    for (size_t i = startPos; i < endPos; i++) {
         book += pieces[i];
     }
     return book;
@@ -96,7 +95,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
     std::vector <std::string> subStrs;
     std::string body = messageFrame.getBody();
     split(body, subStrs, " ");
-    if (subStrs[1] == "wish") {
+    if (subStrs[1] == "wish" && subStrs[0] != _inventory.getUsername()) {
         std::string book = extractBookName(subStrs, 4, subStrs.size()); // starting from the word 'borrow'
         if (_inventory.isInInventory(genre, book)) {
             Frame ansFrame = Frame(SEND);
@@ -122,8 +121,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
         ansFrame.setBody(body);
         _connectionHandler->sendFrameAscii(ansFrame.toString(), STOMP_DELIMITER.c_str()[0]);
     }
-    else if(subStrs[0] == _inventory.getUsername()) return;
-    else if (subStrs[1] == "has") {
+    else if (subStrs[1] == "has" && subStrs[2] != "added") {
         std::string book = extractBookName(subStrs, 2, subStrs.size()); //staring after the word 'has'
         if (_inventory.isInWishList(genre, book)) {
             std::string lender = subStrs[0];
