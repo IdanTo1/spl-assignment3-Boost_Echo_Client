@@ -60,7 +60,7 @@ void ServerHandler::parseUserFrame(Frame frameFromClient) {
             break;
         }
         case DISCONNECT: {
-            if(_loggedIn) {
+            if (_loggedIn) {
                 _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
             }
             _loggedIn = false;
@@ -95,6 +95,9 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
     std::vector <std::string> subStrs;
     std::string body = messageFrame.getBody();
     split(body, subStrs, " ");
+    if (subStrs.size() == 1) { // no spaces in name, meaning status
+        return;
+    }
     if (subStrs[1] == "wish" && subStrs[0] != _inventory.getUsername()) {
         std::string book = extractBookName(subStrs, 4, subStrs.size()); // starting from the word 'borrow'
         if (_inventory.isInInventory(genre, book)) {
@@ -141,12 +144,13 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
 
 void ServerHandler::parseServerFrame() {
     std::string frameString;
-    while(_connectionHandler == nullptr || !_connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0])) {
-        if(_shouldTerminate) return;
+    while (_connectionHandler == nullptr ||
+           !_connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0])) {
+        if (_shouldTerminate) return;
     }
     Frame frame = Frame(frameString);
     FrameCommand cmd = frame.getCommand();
-    if(!_loggedIn && cmd == RECEIPT) {
+    if (!_loggedIn && cmd == RECEIPT) {
         delete _connectionHandler;
         _connectionHandler = nullptr;
         sendFrameToClient(frame);
@@ -177,7 +181,7 @@ void ServerHandler::listenToClient() {
     while (!_shouldTerminate) {
         boost::unique_lock <boost::mutex> lock(_queues.mutexToServer);
         while (_queues.framesToServer.empty() && !_shouldTerminate) _queues.condToServer.wait(lock);
-        if(_shouldTerminate) return;
+        if (_shouldTerminate) return;
         Frame frameFromClient = _queues.framesToServer.front();
         _queues.framesToServer.pop();
         parseUserFrame(frameFromClient);
