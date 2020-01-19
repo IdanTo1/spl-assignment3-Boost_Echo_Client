@@ -115,9 +115,13 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
         _inventory.removeFromInventory(genre, book);
     }
     else if (body == "book status") {
+        std::vector <std::string> genreBooks = _inventory.getGenreBooks(genre);
+        if (genreBooks.empty()) {
+            return;
+        }
         Frame ansFrame = Frame(SEND);
         ansFrame.addHeader("destination", genre);
-        std::string body = booksString(_inventory.getGenreBooks(genre));
+        std::string body = booksString(genreBooks);
         ansFrame.setBody(body);
         _connectionHandler->sendFrameAscii(ansFrame.toString(), STOMP_DELIMITER.c_str()[0]);
     }
