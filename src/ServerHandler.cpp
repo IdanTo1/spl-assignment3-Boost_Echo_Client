@@ -86,7 +86,7 @@ std::string ServerHandler::booksString(std::vector <std::string> books) {
         body += book;
         body += ",";
     }
-    body.substr(0, body.size() - 1); // instead of adding a check for last book, just remove last ','
+    body = body.substr(0, body.size() - 1); // instead of adding a check for last book, just remove last ','
     return body;
 }
 
@@ -129,7 +129,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
             ansFrame.addHeader("destination", genre);
             ansFrame.setBody("Taking " + book + " from " + lender);
             _connectionHandler->sendFrameAscii(ansFrame.toString(), STOMP_DELIMITER.c_str()[0]);
-            _inventory.borrowBook(book, lender);
+            _inventory.borrowBook(genre, book, lender);
             _inventory.removeFromWishList(genre, book);
         }
     }
