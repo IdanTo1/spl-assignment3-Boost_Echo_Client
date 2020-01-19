@@ -51,6 +51,8 @@ void UserHandler::split(std::string& line, std::vector <std::string>& cmdParams,
 Frame UserHandler::receiveFrame() {
     boost::unique_lock <boost::mutex> lock(_queues.mutexFromServer);
     while (_queues.framesFromServer.empty()) _queues.condFromServer.wait(lock);
+    // Frame is a small object and creating an empty one isn't a big load on the client
+    if(_shouldTerminate) return Frame();
     Frame ans = _queues.framesFromServer.front();
     _queues.framesFromServer.pop();
     return ans;
@@ -67,7 +69,7 @@ void UserHandler::login(std::string& line) {
     split(line, cmdParams, CMD_DELIMITER);
     size_t portSeparator = cmdParams[1].find(":");
     std::string host = cmdParams[1].substr(0, portSeparator);
-    std::string port = cmdParams[1].substr(portSeparator, cmdParams[1].size());
+    std::string port = cmdParams[1].substr(portSeparator + 1, cmdParams[1].size());
     std::string username = cmdParams[2];
     _inventory.setUsername(username);
     std::string password = cmdParams[3];
@@ -122,6 +124,7 @@ void UserHandler::exitGenre(std::string& line) {
     Frame frame(_actionFrameCommandMap[EXIT_GENRE]);
     frame.addHeader("id", std::to_string(genreId));
     frame.addHeader("receipt", std::to_string(genreId));
+    frame.addHeader("destination", genre);
     sendFrame(frame);
 
     Frame ans = receiveFrame();
@@ -139,6 +142,9 @@ void UserHandler::addBook(std::string& line) {
     split(line, cmdParams, CMD_DELIMITER);
     std::string genre = cmdParams[1];
     std::string book = cmdParams[2];
+    for(uint i = 3; i < cmdParams.size(); i++) {
+        book += cmdParams[i];
+    }
 
     Frame frame = Frame(_actionFrameCommandMap[ADD_BOOK]);
     frame.addHeader("destination", genre);
@@ -192,6 +198,13 @@ void UserHandler::logout(std::string& line) {
     if (ansCmd == ERROR) {
         std::cout << ans.getBody() << std::endl;
     }
+    else {// ansCmd == RECEIPT
+        _inventory.clear();
+        boost::lock_guard <boost::mutex> lock(_queues.mutexFromServer);
+        while(!_queues.framesFromServer.empty()) _queues.framesFromServer.pop();
+        std::cout << "Disconnected from server" << std::endl;
+    }
+
 }
 
 void UserHandler::parseLine(std::string line) {
@@ -235,9 +248,9 @@ void UserHandler::parseLine(std::string line) {
 }
 
 void UserHandler::run() {
+    const short bufSize = 1024;
+    char buf[bufSize];
     while (!_shouldTerminate) {
-        const short bufSize = 1024;
-        char buf[bufSize];
         std::cin.getline(buf, bufSize);
         std::string line(buf);
         parseLine(line);

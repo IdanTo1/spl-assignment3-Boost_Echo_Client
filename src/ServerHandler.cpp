@@ -8,9 +8,7 @@
 ServerHandler::ServerHandler(ConcurrentDataQueues& queues, ClientInventory& inventory) :
         _connectionHandler(nullptr), _queues(queues), _inventory(inventory) {}
 
-ServerHandler::~ServerHandler() {
-    delete _connectionHandler;
-}
+ServerHandler::~ServerHandler() = default;
 
 void ServerHandler::split(std::string& str, std::vector <std::string>& subStrs, std::string delimiter) {
     size_t start = 0U;
@@ -43,20 +41,31 @@ void ServerHandler::parseUserFrame(Frame frameFromClient) {
     FrameCommand cmd = frameFromClient.getCommand();
     switch (cmd) {
         case CONNECT: {
+            if (_loggedIn) {
+                Frame frame = Frame(ERROR, "already logged in. you should logout before logging in again");
+                sendFrameToClient(frame);
+                return;
+            }
             std::string host = frameFromClient.getHeaderVal("host");
             short port = boost::lexical_cast<short>(frameFromClient.getHeaderVal("port"));
             _connectionHandler = new ConnectionHandler(host, port);
             if (!_connectionHandler->connect()) {
                 Frame frame = Frame(ERROR, "Could not connect to server");
+                sendFrameToClient(frame);
             }
             else {
                 _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
+                _loggedIn = true;
             }
             break;
         }
         case DISCONNECT: {
-            _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
-            delete _connectionHandler;
+            if(_loggedIn) {
+                _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
+            }
+            _loggedIn = false;
+
+            break;
         }
         default:
             _connectionHandler->sendFrameAscii(frameFromClient.toString(), STOMP_DELIMITER.c_str()[0]);
@@ -113,6 +122,7 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
         ansFrame.setBody(body);
         _connectionHandler->sendFrameAscii(ansFrame.toString(), STOMP_DELIMITER.c_str()[0]);
     }
+    else if(subStrs[0] == _inventory.getUsername()) return;
     else if (subStrs[1] == "has") {
         std::string book = extractBookName(subStrs, 2, subStrs.size()); //staring after the word 'has'
         if (_inventory.isInWishList(genre, book)) {
@@ -129,12 +139,20 @@ void ServerHandler::parseMessageFrame(Frame messageFrame) {
 
 void ServerHandler::parseServerFrame() {
     std::string frameString;
-    _connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0]);
+    while(_connectionHandler == nullptr || !_connectionHandler->getFrameAscii(frameString, STOMP_DELIMITER.c_str()[0])) {
+        if(_shouldTerminate) return;
+    }
     Frame frame = Frame(frameString);
     FrameCommand cmd = frame.getCommand();
+    if(!_loggedIn && cmd == RECEIPT) {
+        delete _connectionHandler;
+        _connectionHandler = nullptr;
+        sendFrameToClient(frame);
+    }
     switch (cmd) {
         case MESSAGE: {
             parseMessageFrame(frame);
+            break;
         }
         default: { // CONNECTED, RECEIPT, and ERROR frames, should be passed to user.
             sendFrameToClient(frame);
@@ -142,12 +160,32 @@ void ServerHandler::parseServerFrame() {
     }
 }
 
+void ServerHandler::terminate() {
+    _shouldTerminate = true;
+}
+
 void ServerHandler::run() {
-    Frame frameFromClient;
-    while (true) {
-        while ((frameFromClient = receiveFrameFromClient()).getCommand() != UNINITIALIZED) {
-            parseUserFrame(frameFromClient);
+    boost::thread listenToSocketTh(&ServerHandler::listenToSocket, this);
+    listenToClient();
+    listenToSocketTh.join();
+
+}
+
+void ServerHandler::listenToClient() {
+    while (!_shouldTerminate) {
+        boost::unique_lock <boost::mutex> lock(_queues.mutexToServer);
+        while (_queues.framesToServer.empty() && !_shouldTerminate) _queues.condToServer.wait(lock);
+        if(_shouldTerminate) return;
+        Frame frameFromClient = _queues.framesToServer.front();
+        _queues.framesToServer.pop();
+        parseUserFrame(frameFromClient);
+    }
+}
+
+void ServerHandler::listenToSocket() {
+    while (!_shouldTerminate) {
+        if (_loggedIn) {
+            parseServerFrame();
         }
-        parseServerFrame();
     }
 }

@@ -40,6 +40,7 @@ class Frame {
         Frame(std::string& frameString);
 
         FrameCommand static strToEnum(const std::string& str);
+        std::string static enumToStr(const FrameCommand cmd);
 
         const FrameCommand getCommand() const;
         void setCommand(FrameCommand command);

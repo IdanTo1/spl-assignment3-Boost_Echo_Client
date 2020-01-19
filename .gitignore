@@ -38,3 +38,6 @@
 bin/*
 #project files
 *.txt
+cmake-build-debug
+testing
+*.json

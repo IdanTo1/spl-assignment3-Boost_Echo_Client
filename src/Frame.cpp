@@ -4,7 +4,6 @@
 
 #include "../include/Frame.h"
 
-
 Frame::Frame() : _headers() {}
 
 Frame::Frame(FrameCommand command) : _command(command), _headers() {}
@@ -12,12 +11,12 @@ Frame::Frame(FrameCommand command) : _command(command), _headers() {}
 Frame::Frame(FrameCommand command, std::string body) : _command(command), _headers(), _body(body) {}
 
 Frame::Frame(std::string& frameString) : _headers() {
-    std::string line = "";
+    std::string line;
     std::string delimiter = "\n";
     int framePart = COMMAND_PART;
     size_t start = 0U;
     size_t end = frameString.find(delimiter);
-    while (line != STOMP_DELIMITER && framePart != BODY_PART) {
+    do {
         line = frameString.substr(start, end - start);
         start = end + delimiter.length();
         end = line.find(delimiter, start);
@@ -25,6 +24,7 @@ Frame::Frame(std::string& frameString) : _headers() {
             case COMMAND_PART: {
                 _command = strToEnum(line);
                 framePart = HEADERS_PART;
+                break;
             }
             case HEADERS_PART: {
                 size_t portSeparator = line.find(":");
@@ -39,7 +39,7 @@ Frame::Frame(std::string& frameString) : _headers() {
             default:
                 break; // will never happen.
         }
-    }
+    } while (line != STOMP_DELIMITER && framePart != BODY_PART);
     start = end + delimiter.length();
     _body = frameString.substr(start, frameString.size() - start); // no need for last char in body
 }
@@ -77,6 +77,31 @@ FrameCommand Frame::strToEnum(const std::string& str) {
     }
 }
 
+std::string Frame::enumToStr(const FrameCommand cmd) {
+    switch (cmd) {
+        case SEND:
+            return "SEND";
+        case MESSAGE:
+            return "MESSAGE";
+        case CONNECT:
+            return "CONNECT";
+        case CONNECTED:
+            return "CONNECTED";
+        case RECEIPT:
+            return "RECEIPT";
+        case ERROR:
+            return "ERROR";
+        case SUBSCRIBE:
+            return "SUBSCRIBE";
+        case UNSUBSCRIBE:
+            return "UNSUBSCRIBE";
+        case DISCONNECT:
+            return "DISCONNECT";
+        default:
+            return "UNINITIALIZED";
+    }
+}
+
 const FrameCommand Frame::getCommand() const {
     return _command;
 }
@@ -103,4 +128,15 @@ void Frame::addHeader(std::string header, std::string value) {
 
 const std::string Frame::getHeaderVal(const std::string& header) const {
     return _headers.at(header);
+}
+
+std::string Frame::toString() {
+    std::string frameString = enumToStr(_command) + "\n";
+    for (auto header : _headers) {
+        frameString += (header.first + ":" + header.second + "\n");
+    }
+    frameString += "\n";
+    frameString += _body;
+    frameString += "\0";
+    return frameString;
 }

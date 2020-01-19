@@ -64,7 +64,6 @@ class UserHandler {
 
     public:
         UserHandler(ConcurrentDataQueues& queues, ClientInventory& inventory);
-        ~UserHandler();
         void run();
 };
 

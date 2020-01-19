@@ -21,6 +21,8 @@ class ClientInventory {
                         std::map <std::string, std::string>& borrowMap,
                         std::map <std::string, std::vector<std::string>>& wishList);
 
+        void clear();
+
         void addBook(std::string genre, std::string book);
         std::vector <std::string> getGenreBooks(std::string genre);
 
