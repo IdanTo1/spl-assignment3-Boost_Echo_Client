@@ -30,10 +30,10 @@ Frame::Frame(std::string& frameString) : _headers() {
                 size_t portSeparator = line.find(":");
                 if (portSeparator == std::string::npos) {
                     framePart = BODY_PART;
-                    continue;
+                    break;
                 }
                 std::string header = line.substr(0, portSeparator);
-                std::string headerVal = line.substr(portSeparator, line.size());
+                std::string headerVal = line.substr(portSeparator + 1, line.size());
                 _headers[header] = headerVal;
             }
             default:

@@ -32,7 +32,7 @@ std::vector <std::string> ClientInventory::getGenreBooks(std::string genre) {
 
 bool ClientInventory::isInInventory(std::string genre, std::string book) {
     boost::lock_guard <boost::mutex> lock(_inventoryMutex);
-    std::vector <std::string> genreInventory = _inventory[genre];
+    std::vector <std::string> genreInventory = _inventory.at(genre);
     return (std::find(genreInventory.begin(), genreInventory.end(), book) != genreInventory.end());
 }
 
